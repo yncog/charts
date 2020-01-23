@@ -25,11 +25,16 @@ spec:
       nodePort: {{.Values.master.nodePort}}
       {{end}}
     - port: {{ .Values.master.slaveListenerPort }}
+      name: slavelistener
       targetPort: {{ .Values.master.slaveListenerPort }}
       {{ if (and (eq .Values.master.slaveListenerServiceType "NodePort") (not (empty .Values.master.slaveListenerPort))) }}
       nodePort: {{.Values.master.slaveListenerPort}}
       {{end}}
-      name: slavelistener
+{{- range $index, $port := .Values.master.extraPorts }}
+    - port: {{ $port.port }}
+      name: {{ $port.name }}
+      targetPort: {{ $port.port }}
+{{- end }}
   selector:
     "app.kubernetes.io/component": "{{ .Values.master.componentName }}"
     "app.kubernetes.io/instance": "{{ .Release.Name }}"
